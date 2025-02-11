@@ -1,0 +1,86 @@
+<html
+  lang="en"
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:f="jakarta.faces.core"
+  xmlns:jsf="jakarta.faces"
+  xmlns:h="jakarta.faces.html"
+  xmlns:p="http://primefaces.org/ui"
+>
+  <f:view>
+    <h:head> </h:head>
+    <h:body>
+      <h:form>
+        <p:growl id="messages" showDetail="true" />
+
+        <p:selectOneMenu
+          id="themeSwitcher" 
+          value="#{themeController.selectedTheme}"
+          style="width: 150px"
+        >
+          <p:ajax update="@all" />
+          <f:selectItems value="#{themeController.allThemes}" />          
+        </p:selectOneMenu>
+
+        <p:panelGrid
+          columns="3"
+          layout="flex"
+          styleClass="showcase-text-align-center"
+        >
+          <p:column>
+            <span class="ui-float-label">
+              <p:inputNumber
+                id="requestCounter"
+                disabled="true"
+                value="#{requestController.counter}"
+              />
+              <p:outputLabel for="@previous" value="Request-Scope Counter" />
+            </span>
+          </p:column>
+          <p:column>
+            <span class="ui-float-label">
+              <p:inputNumber
+                id="sessionCounter"
+                disabled="true"
+                value="#{sessionController.counter}"
+              />
+              <p:outputLabel for="@previous" value="Session-Scope Counter" />
+            </span>
+          </p:column>
+          <p:column>
+            <span class="ui-float-label">
+              <p:inputNumber
+                id="applicationCounter"
+                disabled="true"
+                value="#{applicationController.counter}"
+              />
+              <p:outputLabel for="@previous" value="App-Scope Counter" />
+            </span>
+          </p:column>
+        </p:panelGrid>
+        <p:divider />
+        <p:toolbar>
+          <p:toolbarGroup>
+            <p:commandButton
+              ajax="true"
+              action="#{requestController.incrementCounter}"
+              value="Request Increment"
+              update="requestCounter,sessionCounter,applicationCounter"
+            />
+            <p:commandButton
+              ajax="true"
+              action="#{sessionController.incrementCounter}"
+              value="Session Increment"
+              update="requestCounter,sessionCounter,applicationCounter"
+            />
+            <p:commandButton
+              ajax="true"
+              action="#{applicationController.incrementCounter}"
+              value="App Increment"
+              update="requestCounter,sessionCounter,applicationCounter"
+            />
+          </p:toolbarGroup>
+        </p:toolbar>
+      </h:form>
+    </h:body>
+  </f:view>
+</html>

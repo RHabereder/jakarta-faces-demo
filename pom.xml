@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>it.nlith</groupId>
+  <artifactId>jakartaee-faces</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>war</packaging>
+  <name>jakartaee-faces</name>
+  <description>A Jakarta Faces 4.0 sample project</description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>17</maven.compiler.release>
+    <failOnMissingWebXml>false</failOnMissingWebXml>
+
+    <!-- Maven Plugins -->
+    <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+    <maven-war-plugin.version>3.4.0</maven-war-plugin.version>
+    <cargo-maven3-plugin.version>1.10.15</cargo-maven3-plugin.version>
+    <maven-dependency-plugin.version>3.8.1</maven-dependency-plugin.version>
+    <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
+    <maven-failsafe-plugin.version>3.5.2</maven-failsafe-plugin.version>
+    <maven-surefire-report-plugin.version>3.5.1</maven-surefire-report-plugin.version>
+
+    <!-- Jakarta EE API -->
+    <jakartaee-api.version>10.0.0</jakartaee-api.version>
+
+    <!-- Wildfly server-->
+    <wildfly.version>34.0.0.Final</wildfly.version>
+    <wildfly-maven-plugin.version>5.0.1.Final</wildfly-maven-plugin.version>
+    <wildfly-arquillian.version>5.0.0.Alpha6</wildfly-arquillian.version>
+    <!--  websockets-jsr and resteasy for client, aligned with Wildfly version. -->
+    <undertow-websockets-jsr.version>2.0.26.Final</undertow-websockets-jsr.version>
+    <resteasy.version>6.2.0.Final</resteasy.version>
+
+    <!-- By default, skip tests -->
+    <skipTests>true</skipTests>
+
+    <!-- Available options are: internetexplorer, chromeheadless, edge, safari, chrome, firefox,
+    htmlunit-->
+    <browser>htmlunit</browser>
+  </properties>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>jakarta.platform</groupId>
+        <artifactId>jakarta.jakartaee-api</artifactId>
+        <version>${jakartaee-api.version}</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>1.18.36</version>
+        <scope>provided</scope>
+      </dependency>
+
+
+      <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter -->
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>5.11.3</version>
+        <scope>test</scope>
+      </dependency>
+
+      <!-- https://mvnrepository.com/artifact/org.hamcrest/hamcrest -->
+      <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest</artifactId>
+        <version>3.0</version>
+        <scope>test</scope>
+      </dependency>
+
+      <!-- https://mvnrepository.com/artifact/org.awaitility/awaitility -->
+      <dependency>
+        <groupId>org.awaitility</groupId>
+        <artifactId>awaitility</artifactId>
+        <version>4.2.2</version>
+        <scope>test</scope>
+      </dependency>
+
+      <!-- JSON path -->
+      <dependency>
+        <groupId>com.jayway.jsonpath</groupId>
+        <artifactId>json-path</artifactId>
+        <version>2.9.0</version>
+        <scope>test</scope>
+      </dependency>
+      <!-- https://mvnrepository.com/artifact/com.jayway.jsonpath/json-path-assert -->
+      <dependency>
+        <groupId>com.jayway.jsonpath</groupId>
+        <artifactId>json-path-assert</artifactId>
+        <version>2.9.0</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>jakarta.platform</groupId>
+      <artifactId>jakarta.jakartaee-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.primefaces</groupId>
+      <artifactId>primefaces</artifactId>
+      <version>14.0.0</version>
+      <classifier>jakarta</classifier>
+    </dependency>
+
+  </dependencies>
+  <build>
+    <finalName>${project.artifactId}</finalName>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler-plugin.version}</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>${maven-war-plugin.version}</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${maven-surefire-plugin.version}</version>
+        <configuration>
+          <skipTests>${skipTests}</skipTests>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>test</phase>
+            <id>default-test</id>
+            <configuration>
+              <excludes>
+                <exclude>**/it/**</exclude>
+              </excludes>
+              <reportsDirectory>
+                ${project.build.directory}/test-reports/unit
+              </reportsDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>${maven-failsafe-plugin.version}</version>
+        <configuration>
+          <skipITs>${skipTests}</skipITs>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>integration-test</phase>
+            <id>integration-test</id>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/it/**</include>
+              </includes>
+              <reportsDirectory>
+                ${project.build.directory}/test-reports/it
+              </reportsDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+
+    <profile>
+      <id>wildfly</id>
+      <dependencies>
+      </dependencies>
+      <properties>
+        <!-- Wildfly server -->
+        <wildfly.artifactId>wildfly-preview-dist</wildfly.artifactId>
+        <jboss-as.home>${project.build.directory}/wildfly-preview-${wildfly.version}</jboss-as.home>
+      </properties>
+      <build>
+        <plugins>
+
+          <!-- unpack a copy of WildFly-->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>${maven-dependency-plugin.version}</version>
+            <executions>
+              <execution>
+                <id>unpack</id>
+                <phase>process-classes</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.wildfly</groupId>
+                      <artifactId>${wildfly.artifactId}</artifactId>
+                      <version>${wildfly.version}</version>
+                      <type>zip</type>
+                      <overWrite>false</overWrite>
+                      <outputDirectory>${project.build.directory}</outputDirectory>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- The WildFly plugin deploys your war to a local running WildFly container -->
+          <!-- To use, run: mvn package wildfly:deploy -->
+          <!-- For Jakarta EE 9, use `wildfly-preview-dist` as artifactId instead to start and
+          deploy applications-->
+          <!-- Run: mvn clean wildfly:run -PWildfly -Dwildfly.artifactId=wildfly-preview-dist
+          -Dwildfly.version=22.0.0.Alpha1 -->
+          <!-- or set the `jboss-as.home` to run: mvn clean wildfly:run -PWildfly
+          -Djboss-as.home=D:\appsvr\wildfly-preview-22.0.0.Alpha1-->
+          <plugin>
+            <groupId>org.wildfly.plugins</groupId>
+            <artifactId>wildfly-maven-plugin</artifactId>
+            <version>${wildfly-maven-plugin.version}</version>
+          </plugin>
+        </plugins>
+      </build>
+      <repositories>
+        <repository>
+          <id>opensaml</id>
+          <url>https://build.shibboleth.net/nexus/content/repositories/releases/</url>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>${maven-surefire-report-plugin.version}</version>
+      </plugin>
+    </plugins>
+  </reporting>
+</project>
